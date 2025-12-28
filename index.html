@@ -92,25 +92,29 @@
 <div id="app" class="max-w-md mx-auto min-h-screen pb-32">
     
     <!-- 1. 頁首 Banner -->
-    <header class="banner-container">
-        <img src="./banner.jpg" class="banner-img" style="object-position: center bottom;">
-        
-        <!-- 浮動分頁選單 (ICON 橫向呈現) -->
-        <div class="absolute bottom-12 right-4 flex gap-2 z-30">
-            <button @click="currentTab = 'itinerary'" class="w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center active:scale-90 transition-transform">
-                <i data-lucide="map-pin" class="w-5 h-5 text-blue-500"></i>
-            </button>
-            <button @click="currentTab = 'info'" class="w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center active:scale-90 transition-transform">
-                <i data-lucide="info" class="w-5 h-5 text-green-600"></i>
-            </button>
-            <button @click="currentTab = 'shopping'" class="w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center active:scale-90 transition-transform">
-                <i data-lucide="shopping-basket" class="w-5 h-5 text-orange-400"></i>
-            </button>
-            <button @click="currentTab = 'expense'" class="w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center active:scale-90 transition-transform">
-                <i data-lucide="circle-dollar-sign" class="w-5 h-5 text-red-400"></i>
-            </button>
-        </div>
-    </header>
+    <header class="banner-container bg-[#D0E1E9]">
+    <!-- 我加了一個 onerror 處理，如果圖片找不到，它會顯示一個漂亮的漸層不會留白 -->
+    <img src="banner.jpg" 
+         class="banner-img" 
+         onerror="this.style.display='none'"
+         style="object-position: center bottom;">
+    
+    <!-- 浮動分頁選單 -->
+    <div class="absolute bottom-14 right-4 flex gap-2 z-30">
+        <button @click="currentTab = 'itinerary'" class="w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+            <i data-lucide="map-pin" class="w-5 h-5 text-blue-500"></i>
+        </button>
+        <button @click="currentTab = 'info'" class="w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+            <i data-lucide="info" class="w-5 h-5 text-green-600"></i>
+        </button>
+        <button @click="currentTab = 'shopping'" class="w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+            <i data-lucide="shopping-basket" class="w-5 h-5 text-orange-400"></i>
+        </button>
+        <button @click="currentTab = 'expense'" class="w-10 h-10 rounded-full bg-white/90 backdrop-blur shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+            <i data-lucide="circle-dollar-sign" class="w-5 h-5 text-red-400"></i>
+        </button>
+    </div>
+</header>
 
     <!-- 2. 主內容區 -->
     <main class="main-content px-5 pt-8">
