@@ -15,21 +15,18 @@
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #F7F4EB; /* 米色手帳底色 */
+            background-color: #F7F4EB;
             background-image: radial-gradient(#E0E5D5 1px, transparent 1px);
             background-size: 24px 24px;
             color: #5C5B57;
             overflow-x: hidden;
         }
-
-        /* Soft Shadow 與 圓角設計 */
         .journal-card {
             background: #FFFFFF;
             border-radius: 24px;
             box-shadow: 4px 4px 0px #E0E5D5;
             border: 1px solid #EAE7DC;
         }
-
         .banner-container {
             width: 100%;
             height: 380px;
@@ -39,8 +36,6 @@
         .banner-img {
             width: 100%; height: 100%; object-fit: cover; object-position: center 80%;
         }
-
-        /* 頁首圖片與內容無縫銜接 */
         .main-content {
             margin-top: -50px;
             border-radius: 40px 40px 0 0;
@@ -49,11 +44,8 @@
             background: #F7F4EB;
             min-height: calc(100vh - 330px);
         }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* 拖拽動畫 */
         .ghost { opacity: 0.3; background: #CBD5E0; }
         .modal-fade-enter-active, .modal-fade-leave-active { transition: all 0.3s ease; }
         .modal-fade-enter-from, .modal-fade-leave-to { opacity: 0; transform: translateY(20px); }
@@ -62,12 +54,9 @@
 <body>
 
 <div id="app" class="max-w-md mx-auto min-h-screen pb-32">
-    
     <!-- 1. Header Banner -->
     <header class="banner-container">
         <img src="banner.jpg" class="banner-img" onerror="this.src='https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200'">
-        
-        <!-- 分頁 Tab 按鈕 (浮在圖片上方) -->
         <div class="absolute bottom-16 right-4 flex gap-2 z-30">
             <button @click="currentTab = 'itinerary'" :class="currentTab === 'itinerary' ? 'bg-slate-700 text-white' : 'bg-white/90 text-slate-500'" class="w-10 h-10 rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all">
                 <i data-lucide="map-pin" class="w-5 h-5"></i>
@@ -84,25 +73,16 @@
         </div>
     </header>
 
-    <!-- 2. 主內容區域 -->
+    <!-- 2. 主內容 -->
     <main class="main-content px-5 pt-8">
-        
         <div v-if="currentTab === 'itinerary'">
-            <!-- 天氣資訊卡片 -->
-            <div class="journal-card p-4 mb-6 flex justify-between items-center bg-blue-50/50">
-                <div>
-                    <h2 class="text-xl font-bold flex items-center gap-2">
-                        <i data-lucide="cloud-snow" class="text-blue-400"></i> 札幌
-                    </h2>
-                    <p class="text-xs text-slate-400">當日氣溫 2°C / 體感 -2°C</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-xs font-bold text-blue-500">Snowy</p>
-                    <p class="text-[10px] text-slate-400 italic">Winter Trip</p>
-                </div>
+            <!-- 標題與重設 -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Hokkaido Journal</h2>
+                <button @click="resetData" class="text-[10px] text-slate-300 border border-slate-200 px-2 py-1 rounded-lg">重置行程</button>
             </div>
 
-            <!-- 橫向捲動日期選擇器 -->
+            <!-- 日期選擇 -->
             <div class="flex overflow-x-auto no-scrollbar gap-3 mb-8 pb-2">
                 <div v-for="d in dates" :key="d.date" 
                      @click="selectedDate = d.date"
@@ -113,56 +93,29 @@
                 </div>
             </div>
 
-            <!-- 每日行程時間軸 (支援拖曳) -->
+            <!-- 時間軸 -->
             <div class="relative">
-                <draggable 
-                    v-model="schedule" 
-                    item-key="id"
-                    handle=".drag-handle"
-                    ghost-class="ghost"
-                    @end="saveToLocal"
-                >
+                <draggable v-model="schedule" item-key="id" handle=".drag-handle" ghost-class="ghost" @end="saveToLocal">
                     <template #item="{element, index}">
                         <div v-if="element.date === selectedDate" class="relative pl-8 mb-4">
-                            <!-- 時間軸點點 -->
                             <div class="absolute left-3 top-0 bottom-0 w-0.5 border-l-2 border-dashed border-slate-200"></div>
-                            <div class="absolute left-0 top-1 w-6 h-6 bg-white border-2 border-slate-700 rounded-full flex items-center justify-center z-10 drag-handle cursor-grab active:cursor-grabbing">
+                            <div class="absolute left-0 top-1 w-6 h-6 bg-white border-2 border-slate-700 rounded-full flex items-center justify-center z-10 drag-handle cursor-grab">
                                 <i :data-lucide="getCategoryIcon(element.category)" class="w-3 h-3 text-slate-700"></i>
                             </div>
-
-                            <!-- 行程卡片 -->
                             <div class="journal-card p-4 active:scale-[0.98] transition-all cursor-pointer" @click="editItem(element)">
                                 <div class="flex justify-between items-start mb-1">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ element.time }}</span>
-                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold" :class="getCategoryStyle(element.category)">
-                                        {{ element.category }}
-                                    </span>
+                                    <span class="text-[10px] font-bold text-slate-400">{{ element.time }}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold" :class="getCategoryStyle(element.category)">{{ element.category }}</span>
                                 </div>
-                                <h3 class="font-bold text-slate-700 text-base leading-tight">{{ element.title }}</h3>
-                                
-                                <div class="mt-2 space-y-1">
-                                    <p v-if="element.openTime" class="text-[10px] text-slate-400 flex items-center gap-1">
-                                        <i data-lucide="clock" class="w-3 h-3"></i> 營業: {{ element.openTime }}
-                                    </p>
-                                    <p v-if="element.ticket" class="text-[10px] text-blue-500 flex items-center gap-1">
-                                        <i data-lucide="ticket" class="w-3 h-3"></i> 門票: {{ element.ticket }}
-                                    </p>
-                                    <p v-if="element.note" class="text-xs text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg italic leading-relaxed">
-                                        {{ element.note }}
-                                    </p>
-                                </div>
-
-                                <!-- 地圖連結按鈕 (整合導航) -->
+                                <h3 class="font-bold text-slate-700 text-base">{{ element.title }}</h3>
+                                <p v-if="element.note" class="text-xs text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg italic leading-relaxed">{{ element.note }}</p>
                                 <div class="mt-3 pt-3 border-t border-slate-50 flex justify-end">
-                                    <button @click.stop="openMap(element.title)" class="text-[10px] font-bold text-blue-500 flex items-center gap-1">
-                                        <i data-lucide="navigation" class="w-3 h-3"></i> 導航至此
-                                    </button>
+                                    <button @click.stop="openMap(element.title)" class="text-[10px] font-bold text-blue-500 flex items-center gap-1">📍 導航</button>
                                 </div>
                             </div>
-
-                            <!-- 交通時間顯示 (計算到下一個行程) -->
+                            <!-- 交通標籤 -->
                             <div v-if="hasFollowingItem(index)" class="my-4 flex items-center gap-2">
-                                <div class="bg-[#E0E5D5] px-3 py-1 rounded-full flex items-center gap-2 text-[10px] text-slate-600 font-medium">
+                                <div class="bg-[#E0E5D5] px-3 py-1 rounded-full flex items-center gap-2 text-[10px] text-slate-600">
                                     <i :data-lucide="element.transMode || 'car'" class="w-3 h-3"></i>
                                     <span>下站約 {{ element.transTime || '--' }} 分鐘</span>
                                 </div>
@@ -172,89 +125,52 @@
                 </draggable>
             </div>
 
-            <!-- 新增行程按鈕 (+) -->
-            <button @click="openAddModal" class="fixed bottom-28 right-6 w-14 h-14 bg-slate-700 text-white rounded-full shadow-2xl flex items-center justify-center active:scale-75 transition-all z-50">
+            <!-- 新增按鈕 -->
+            <button @click="openAddModal" class="fixed bottom-28 right-6 w-14 h-14 bg-slate-700 text-white rounded-full shadow-2xl flex items-center justify-center active:scale-75 z-50">
                 <i data-lucide="plus" class="w-8 h-8"></i>
             </button>
         </div>
 
-        <!-- 3. 其他分頁 (資訊/匯率/花費) -->
+        <!-- 其他分頁 -->
         <div v-if="currentTab === 'info'" class="space-y-6">
-            <h2 class="text-xl font-bold">旅行資訊</h2>
-            <!-- 簡單匯率換算 -->
             <div class="journal-card p-5 bg-slate-800 text-white">
-                <p class="text-[10px] opacity-60 mb-2 uppercase tracking-widest">Currency Converter</p>
+                <p class="text-[10px] opacity-60 mb-2 uppercase">Currency Converter</p>
                 <div class="flex items-center gap-4">
                     <input type="number" v-model="jpyInput" class="w-full bg-white/10 border-none rounded-xl p-2 text-lg font-bold" placeholder="JPY">
                     <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     <div class="w-full p-2 text-lg font-bold">NT$ {{ Math.round(jpyInput * 0.21) }}</div>
                 </div>
             </div>
-            <div class="text-center py-10 text-slate-300 italic">更多航班、住宿細節請至行程表查看</div>
         </div>
-
     </main>
 
-    <!-- 4. 底部導航欄 -->
+    <!-- 底部導航 -->
     <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md bg-white/90 backdrop-blur-md h-18 rounded-3xl border border-slate-100 shadow-2xl flex items-center justify-around px-6 z-50">
-        <button @click="currentTab = 'itinerary'" :class="currentTab === 'itinerary' ? 'text-slate-800' : 'text-slate-300'" class="flex flex-col items-center gap-1 transition-all">
-            <i data-lucide="calendar" class="w-6 h-6"></i>
-            <span class="text-[10px] font-bold">行程</span>
-        </button>
-        <button @click="currentTab = 'info'" :class="currentTab === 'info' ? 'text-slate-800' : 'text-slate-300'" class="flex flex-col items-center gap-1 transition-all">
-            <i data-lucide="info" class="w-6 h-6"></i>
-            <span class="text-[10px] font-bold">資訊</span>
-        </button>
-        <button @click="currentTab = 'shopping'" :class="currentTab === 'shopping' ? 'text-slate-800' : 'text-slate-300'" class="flex flex-col items-center gap-1 transition-all">
-            <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-            <span class="text-[10px] font-bold">購物</span>
-        </button>
-        <button @click="currentTab = 'expense'" :class="currentTab === 'expense' ? 'text-slate-800' : 'text-slate-300'" class="flex flex-col items-center gap-1 transition-all">
-            <i data-lucide="wallet" class="w-6 h-6"></i>
-            <span class="text-[10px] font-bold">花費</span>
+        <button v-for="t in ['itinerary','info','shopping','expense']" :key="t" @click="currentTab = t" :class="currentTab === t ? 'text-slate-800' : 'text-slate-300'" class="flex flex-col items-center gap-1 transition-all">
+            <i :data-lucide="t==='itinerary'?'calendar':t==='info'?'info':t==='shopping'?'shopping-bag':'wallet'" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold">{{ t === 'itinerary' ? '行程' : t === 'info' ? '資訊' : t === 'shopping' ? '購物' : '花費' }}</span>
         </button>
     </nav>
 
-    <!-- 5. 編輯/新增彈窗系統 -->
+    <!-- 彈窗 -->
     <transition name="modal-fade">
-        <div v-if="showModal" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div v-if="showModal" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0">
             <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showModal = false"></div>
-            <div class="relative bg-white w-full max-w-md rounded-t-[40px] sm:rounded-[40px] p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div class="relative bg-white w-full max-w-md rounded-t-[40px] p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
                 <h2 class="text-xl font-bold mb-6 text-slate-700">{{ isEditing ? '修改行程' : '加入新行程' }}</h2>
-                
                 <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 block mb-1">分類</label>
-                        <select v-model="form.category" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm">
-                            <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 block mb-1">地點名稱</label>
-                        <input v-model="form.title" type="text" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm" placeholder="去哪裡？">
-                    </div>
+                    <select v-model="form.category" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm">
+                        <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+                    </select>
+                    <input v-model="form.title" type="text" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm" placeholder="地點名稱">
                     <div class="flex gap-4">
-                        <div class="flex-1">
-                            <label class="text-[10px] font-bold text-slate-400 block mb-1">時間</label>
-                            <input v-model="form.time" type="text" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm" placeholder="09:00">
-                        </div>
-                        <div class="flex-1">
-                            <label class="text-[10px] font-bold text-slate-400 block mb-1">交通工具</label>
-                            <select v-model="form.transMode" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm">
-                                <option value="car">🚗 開車</option>
-                                <option value="bus">🚌 大眾運輸</option>
-                                <option value="foot">🚶 步行</option>
-                            </select>
-                        </div>
+                        <input v-model="form.time" type="text" class="flex-1 bg-slate-50 border-none rounded-xl p-3 text-sm" placeholder="時間">
+                        <input v-model="form.transTime" type="number" class="flex-1 bg-slate-50 border-none rounded-xl p-3 text-sm" placeholder="交通時間(分)">
                     </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 block mb-1">備註/特色</label>
-                        <textarea v-model="form.note" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm h-24" placeholder="筆記一下..."></textarea>
-                    </div>
-
+                    <textarea v-model="form.note" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm h-24" placeholder="備註..."></textarea>
                     <div class="flex gap-3 pt-4">
-                        <button v-if="isEditing" @click="confirmDelete" class="flex-1 py-4 rounded-2xl bg-red-50 text-red-500 font-bold text-sm">刪除</button>
-                        <button @click="saveForm" class="flex-[2] py-4 rounded-2xl bg-slate-700 text-white font-bold text-sm">儲存</button>
+                        <button v-if="isEditing" @click="confirmDelete" class="flex-1 py-4 rounded-2xl bg-red-50 text-red-500 font-bold">刪除</button>
+                        <button @click="saveForm" class="flex-[2] py-4 rounded-2xl bg-slate-700 text-white font-bold">儲存</button>
                     </div>
                 </div>
             </div>
@@ -266,9 +182,7 @@
     const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
 
     createApp({
-        components: {
-            draggable: window.vuedraggable
-        },
+        components: { draggable: window.vuedraggable },
         setup() {
             const currentTab = ref('itinerary');
             const selectedDate = ref('2025-11-06');
@@ -277,54 +191,42 @@
             const jpyInput = ref(1000);
             const categories = ['景點', '住宿', '美食', '購物', '航班', '交通', '其他'];
 
-            // 預載行程資訊
-            const initialSchedule = [
-                // Day 1
-                { id: 1, date: '2025-11-06', time: '09:10', category: '航班', title: '台北(TSA) - 羽田(HND)', note: 'JL96 (09:10-13:00)\n轉機2小時，T3拉行李，過國內線安檢搭公車', transMode: 'bus', transTime: 120 },
-                { id: 2, date: '2025-11-06', time: '15:30', category: '航班', title: '羽田(HND) - 新千歲(CTS)', note: 'JL521 (15:30-17:00)\nT1飛札幌', transMode: 'bus', transTime: 30 },
-                { id: 3, date: '2025-11-06', time: '17:30', category: '交通', title: '新千歲國內線 B1 JR車站', note: '販賣機買指定席車票 (1680yen)', transMode: 'bus', transTime: 30 },
-                { id: 4, date: '2025-11-06', time: '18:00', category: '住宿', title: 'Mitsui Garden Hotel Sapporo West', note: 'Check-in 飯店', openTime: '15:00+' },
-                { id: 5, date: '2025-11-06', time: '19:30', category: '美食', title: '奧芝商店 湯咖哩 (站前創成寺)', note: '晚餐時間，逛 3 coins / Lakole', openTime: '11:00-22:00' },
-                
-                // Day 2
-                { id: 6, date: '2025-11-07', time: '08:00', category: '交通', title: 'Toyota 租車取車 (札幌站南口店)', transMode: 'car', transTime: 180 },
-                { id: 7, date: '2025-11-07', time: '11:00', category: '美食', title: 'Furano Délíce', note: '吃起司蛋糕', openTime: '10:00-18:00', transMode: 'car', transTime: 60 },
-                { id: 8, date: '2025-11-07', time: '12:00', category: '美食', title: 'Furanoya 湯咖哩', note: '午餐時間', transMode: 'car', transTime: 60 },
-                { id: 9, date: '2025-11-07', time: '13:00', category: '景點', title: '富田農場', note: '經典薰衣草/花田散策', transMode: 'car', transTime: 120 },
-                { id: 10, date: '2025-11-07', time: '15:00', category: '景點', title: '白金清池', transMode: 'car', transTime: 60 },
-                { id: 11, date: '2025-11-07', time: '16:00', category: '景點', title: '白鬚瀑布', transMode: 'car', transTime: 60 },
-                { id: 12, date: '2025-11-07', time: '17:00', category: '景點', title: '聖誕樹之木', transMode: 'car', transTime: 60 },
-                { id: 13, date: '2025-11-07', time: '18:00', category: '住宿', title: 'JR Inn 旭川', note: 'Aeon吃晚餐', transMode: 'car', transTime: 30 },
-
-                // Day 3
-                { id: 14, date: '2025-11-08', time: '09:30', category: '景點', title: '旭岳纜車 (山麓站-姿見站)', note: '旭岳大雪山散策', transMode: 'foot', transTime: 150 },
-                { id: 15, date: '2025-11-08', time: '12:30', category: '美食', title: '姿見食堂', note: '午餐', transMode: 'car', transTime: 90 },
-                { id: 16, date: '2025-11-08', time: '14:00', category: '景點', title: '就實之丘', transMode: 'car', transTime: 120 },
-                { id: 17, date: '2025-11-08', time: '16:00', category: '景點', title: '男山酒造資料館', note: '清酒文化參觀', transMode: 'car', transTime: 120 },
-                { id: 18, date: '2025-11-08', time: '18:00', category: '美食', title: '成吉思汗大黑屋', note: '烤羊肉晚餐' },
-
-                // Day 4
-                { id: 19, date: '2025-11-09', time: '09:00', category: '交通', title: '出發前往小樽', transMode: 'car', transTime: 120 },
-                { id: 20, date: '2025-11-09', time: '11:00', category: '美食', title: '小樽三角市場', note: '吃海鮮丼', transMode: 'foot', transTime: 60 },
-                { id: 21, date: '2025-11-09', time: '13:00', category: '景點', title: '小樽運河 & cafe BAAL', transMode: 'foot', transTime: 90 },
-                { id: 22, date: '2025-11-09', time: '14:30', category: '美食', title: 'LeTAO 總店', note: '下午茶時間', transMode: 'car', transTime: 60 },
-                { id: 23, date: '2025-11-09', time: '15:30', category: '景點', title: '白色戀人公園', transMode: 'car', transTime: 90 },
-                { id: 24, date: '2025-11-09', time: '17:00', category: '景點', title: '札幌啤酒博物館', transMode: 'car', transTime: 120 },
-                { id: 25, date: '2025-11-09', time: '19:00', category: '美食', title: '麵屋翔 札幌店', note: '拉麵晚餐', transMode: 'foot', transTime: 60 },
-                { id: 26, date: '2025-11-09', time: '20:00', category: '景點', title: '札幌時計台 / 大通公園', note: '住宿: VESSEL HOTEL Campana Susukino' },
-
-                // Day 5
-                { id: 27, date: '2025-11-10', time: '08:35', category: '景點', title: '北海道廳紅磚廳舍', transMode: 'car', transTime: 30 },
-                { id: 28, date: '2025-11-10', time: '09:00', category: '景點', title: '北海道神宮', transMode: 'car', transTime: 150 },
-                { id: 29, date: '2025-11-10', time: '11:30', category: '美食', title: 'Amano Family Farm', note: '午餐時間', transMode: 'car', transTime: 90 },
-                { id: 30, date: '2025-11-10', time: '13:00', category: '景點', title: '登別地獄谷', transMode: 'foot', transTime: 60 },
-                { id: 31, date: '2025-11-10', time: '14:00', category: '景點', title: '登別棕熊牧場', transMode: 'car', transTime: 180 },
-                { id: 32, date: '2025-11-10', time: '17:30', category: '住宿', title: '洞爺湖-乃之風', note: '享受溫泉與湖景' }
+            const initialData = [
+                { id: 1, date: '2025-11-06', time: '09:10', category: '航班', title: 'TSA-HND-CTS 轉機出發', note: 'JL96 (09:10-13:00)\n轉機2小時', transMode: 'bus', transTime: 120 },
+                { id: 2, date: '2025-11-06', time: '17:30', category: '交通', title: '新千歲機場 JR 車站', note: '買指定席 1680yen', transMode: 'bus', transTime: 30 },
+                { id: 3, date: '2025-11-06', time: '18:00', category: '住宿', title: 'Mitsui Garden Hotel Sapporo West', note: 'Check-in', transMode: 'foot', transTime: 15 },
+                { id: 4, date: '2025-11-06', time: '19:30', category: '美食', title: '奧芝商店 湯咖哩', note: '逛 3 coins / Lakole' },
+                { id: 5, date: '2025-11-07', time: '08:00', category: '交通', title: 'Toyota 租車取車 (札幌南口)', transMode: 'car', transTime: 180 },
+                { id: 6, date: '2025-11-07', time: '11:00', category: '美食', title: 'Furano Délíce', note: '起司蛋糕', transTime: 60 },
+                { id: 7, date: '2025-11-07', time: '12:00', category: '美食', title: 'Furanoya 湯咖哩', transTime: 60 },
+                { id: 8, date: '2025-11-07', time: '13:00', category: '景點', title: '富田農場', transTime: 120 },
+                { id: 9, date: '2025-11-07', time: '15:00', category: '景點', title: '白金清池', transTime: 60 },
+                { id: 10, date: '2025-11-07', time: '16:00', category: '景點', title: '白鬚瀑布', transTime: 60 },
+                { id: 11, date: '2025-11-07', time: '17:00', category: '景點', title: '聖誕樹之木', transTime: 60 },
+                { id: 12, date: '2025-11-07', time: '18:00', category: '住宿', title: 'JR Inn 旭川', note: 'Aeon 晚餐' },
+                { id: 13, date: '2025-11-08', time: '09:30', category: '景點', title: '旭岳纜車', note: '姿見站', transTime: 180 },
+                { id: 14, date: '2025-11-08', time: '12:30', category: '美食', title: '姿見食堂', transTime: 90 },
+                { id: 15, date: '2025-11-08', time: '14:00', category: '景點', title: '就實之丘', transTime: 120 },
+                { id: 16, date: '2025-11-08', time: '16:00', category: '景點', title: '男山酒造資料館', transTime: 120 },
+                { id: 17, date: '2025-11-08', time: '18:00', category: '美食', title: '成吉思汗大黑屋' },
+                { id: 18, date: '2025-11-09', time: '09:00', category: '交通', title: '出發前往小樽', transTime: 120 },
+                { id: 19, date: '2025-11-09', time: '11:00', category: '美食', title: '小樽三角市場', transTime: 120 },
+                { id: 20, date: '2025-11-09', time: '13:00', category: '景點', title: '小樽運河 & cafe BAAL', transTime: 90 },
+                { id: 21, date: '2025-11-09', time: '14:30', category: '美食', title: 'LeTAO 總店', transTime: 60 },
+                { id: 22, date: '2025-11-09', time: '15:30', category: '景點', title: '白色戀人公園', transTime: 90 },
+                { id: 23, date: '2025-11-09', time: '17:00', category: '景點', title: '札幌啤酒博物館', transTime: 120 },
+                { id: 24, date: '2025-11-09', time: '19:00', category: '美食', title: '麵屋翔 札幌店', transTime: 60 },
+                { id: 25, date: '2025-11-09', time: '20:00', category: '景點', title: '大通公園', note: '住宿: VESSEL HOTEL Susukino' },
+                { id: 26, date: '2025-11-10', time: '08:35', category: '景點', title: '北海道廳紅磚廳舍', transTime: 30 },
+                { id: 27, date: '2025-11-10', time: '09:00', category: '景點', title: '北海道神宮', transTime: 150 },
+                { id: 28, date: '2025-11-10', time: '11:30', category: '美食', title: 'Amano Family Farm', transTime: 90 },
+                { id: 29, date: '2025-11-10', time: '13:00', category: '景點', title: '登別地獄谷', transTime: 60 },
+                { id: 30, date: '2025-11-10', time: '14:00', category: '景點', title: '登別棕熊牧場', transTime: 180 },
+                { id: 31, date: '2025-11-10', time: '17:30', category: '住宿', title: '洞爺湖-乃之風' }
             ];
 
-            const schedule = ref(JSON.parse(localStorage.getItem('hokkaido_v3')) || initialSchedule);
+            const schedule = ref(JSON.parse(localStorage.getItem('hokkaido_vfinal')) || initialData);
             const form = ref({});
-
             const dates = [
                 { weekday: 'Thu', day: '06', date: '2025-11-06' }, { weekday: 'Fri', day: '07', date: '2025-11-07' },
                 { weekday: 'Sat', day: '08', date: '2025-11-08' }, { weekday: 'Sun', day: '09', date: '2025-11-09' },
@@ -334,73 +236,28 @@
                 { weekday: 'Sun', day: '16', date: '2025-11-16' }
             ];
 
-            const openAddModal = () => {
-                isEditing.value = false;
-                form.value = { id: Date.now(), date: selectedDate.value, category: '景點', time: '10:00', title: '', transMode: 'car' };
-                showModal.value = true;
-            };
-
-            const editItem = (item) => {
-                isEditing.value = true;
-                form.value = { ...item };
-                showModal.value = true;
-            };
-
-            const saveForm = () => {
+            const resetData = () => { if(confirm('重置將恢復預設行程，確定嗎？')) { schedule.value = [...initialData]; saveToLocal(); } };
+            const openAddModal = () => { isEditing.value = false; form.value = { id: Date.now(), date: selectedDate.value, category: '景點', time: '10:00', title: '', transMode: 'car' }; showModal.value = true; };
+            const editItem = (item) => { isEditing.value = true; form.value = { ...item }; showModal.value = true; };
+            const saveForm = () => { 
                 if (!form.value.title) return alert('請輸入名稱');
-                if (isEditing.value) {
-                    const idx = schedule.value.findIndex(i => i.id === form.value.id);
-                    schedule.value[idx] = { ...form.value };
-                } else {
-                    schedule.value.push({ ...form.value });
-                }
-                saveToLocal();
-                showModal.value = false;
+                if (isEditing.value) { const idx = schedule.value.findIndex(i => i.id === form.value.id); schedule.value[idx] = { ...form.value }; }
+                else { schedule.value.push({ ...form.value }); }
+                saveToLocal(); showModal.value = false; 
             };
+            const confirmDelete = () => { if (confirm('確定刪除嗎？')) { schedule.value = schedule.value.filter(i => i.id !== form.value.id); saveToLocal(); showModal.value = false; } };
+            const saveToLocal = () => { localStorage.setItem('hokkaido_vfinal', JSON.stringify(schedule.value)); nextTick(() => lucide.createIcons()); };
+            const openMap = (t) => { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t)}`, '_blank'); };
+            const hasFollowingItem = (index) => { const current = schedule.value[index]; return schedule.value.slice(index + 1).some(i => i.date === current.date); };
+            const getCategoryIcon = (c) => { const m = { '景點': 'map', '美食': 'utensils', '住宿': 'home', '航班': 'plane', '交通': 'car' }; return m[c] || 'star'; };
+            const getCategoryStyle = (c) => { const m = { '景點': 'bg-blue-50 text-blue-500', '美食': 'bg-orange-50 text-orange-400', '住宿': 'bg-green-50 text-green-500', '航班': 'bg-slate-800 text-white' }; return m[c] || 'bg-slate-50 text-slate-400'; };
 
-            const confirmDelete = () => {
-                if (confirm('確定刪除此行程嗎？')) {
-                    schedule.value = schedule.value.filter(i => i.id !== form.value.id);
-                    saveToLocal();
-                    showModal.value = false;
-                }
-            };
-
-            const saveToLocal = () => {
-                localStorage.setItem('hokkaido_v3', JSON.stringify(schedule.value));
-                nextTick(() => lucide.createIcons());
-            };
-
-            const openMap = (title) => {
-                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(title)}`, '_blank');
-            };
-
-            const hasFollowingItem = (index) => {
-                const current = schedule.value[index];
-                return schedule.value.slice(index + 1).some(i => i.date === current.date);
-            };
-
-            const getCategoryIcon = (cat) => {
-                const map = { '景點': 'map', '美食': 'utensils', '住宿': 'home', '航班': 'plane', '交通': 'car', '購物': 'shopping-bag' };
-                return map[cat] || 'star';
-            };
-
-            const getCategoryStyle = (cat) => {
-                const map = { '景點': 'bg-blue-50 text-blue-500', '美食': 'bg-orange-50 text-orange-400', '住宿': 'bg-green-50 text-green-500', '航班': 'bg-slate-800 text-white' };
-                return map[cat] || 'bg-slate-50 text-slate-400';
-            };
-
-            onMounted(() => lucide.createIcons());
+            onMounted(() => { if(!localStorage.getItem('hokkaido_vfinal')) { schedule.value = [...initialData]; saveToLocal(); } lucide.createIcons(); });
             watch([currentTab, selectedDate, showModal], () => nextTick(() => lucide.createIcons()));
 
-            return {
-                currentTab, selectedDate, dates, schedule, showModal, isEditing, form, categories,
-                jpyInput, openAddModal, editItem, saveForm, confirmDelete, openMap, hasFollowingItem,
-                getCategoryIcon, getCategoryStyle, saveToLocal
-            };
+            return { currentTab, selectedDate, dates, schedule, showModal, isEditing, form, categories, jpyInput, openAddModal, editItem, saveForm, confirmDelete, openMap, hasFollowingItem, getCategoryIcon, getCategoryStyle, saveToLocal, resetData };
         }
     }).mount('#app');
 </script>
-
 </body>
 </html>
