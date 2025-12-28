@@ -15,8 +15,8 @@
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #F7F4EB;
-            background-image: radial-gradient(#E0E5D5 1px, transparent 1px);
+            background-color: #F0F4F7;
+            background-image: radial-gradient(#D0E1E9 1px, transparent 1px);
             background-size: 20px 20px;
             color: #5C5B57;
         }
@@ -31,7 +31,7 @@
         /* 頁首滿版 Banner */
         .banner-container {
             width: 100%;
-            height: 250px;
+            height: 300px;
             overflow: hidden;
             position: relative;
         }
@@ -47,7 +47,7 @@
             border-radius: 40px 40px 0 0;
             position: relative;
             z-index: 20;
-            background: #F7F4EB;
+            background: #F0F4F7;
         }
 
         /* 橫向捲動隱藏捲動條 */
@@ -73,12 +73,28 @@
     </style>
 </head>
 <body>
+<style>
+    /* 2. 背景顏色優化 - 配合插畫的冬日感 */
+    body {
+        background-color: #EBF2F5; /* 淺冬藍 */
+        background-image: radial-gradient(#CBD5E0 1px, transparent 1px);
+    }
+    
+    .main-content {
+        background: #EBF2F5; /* 讓插畫下方的雪地感延伸下來 */
+        margin-top: -50px; /* 增加重疊感，讓圓弧切入插畫的雪地部分 */
+    }
 
+    .journal-card {
+        border: 1px solid #D1DBE5;
+        box-shadow: 4px 4px 0px #CBD5E0; /* 陰影也換成冷色調 */
+    }
+</style>
 <div id="app" class="max-w-md mx-auto min-h-screen pb-32">
     
     <!-- 1. 頁首 Banner -->
     <header class="banner-container">
-        <img src="banner.jpg" class="banner-img" alt="Hokkaido Trip">
+        <img src="banner.jpg" class="banner-img" style="object-position: center bottom;">
         
         <!-- 浮動分頁選單 (ICON 橫向呈現) -->
         <div class="absolute bottom-12 right-4 flex gap-2 z-30">
